@@ -86,34 +86,62 @@ def enviar_whatsapp(mensaje):
 def main():
     print("🔍 Iniciando scraper LEGO — Project Hail Mary", flush=True)
     print(f"⏱  Revisando cada {INTERVALO_MIN} minutos\n", flush=True)
-    driver           = crear_driver()
-    alerta_enviada   = False
-    sin_stock_desde  = datetime.now()
-    checks_sin_stock = 0
+
+    driver              = crear_driver()
+    alerta_enviada      = False
+    sin_stock_desde     = datetime.now()
+    checks_sin_stock    = 0
+    checks_hoy          = 0
+    ultimo_reporte      = datetime.now()
+
     try:
         while True:
-            ts = datetime.now().strftime("%H:%M:%S")
+            ts  = datetime.now().strftime("%H:%M:%S")
+            now = datetime.now()
             print(f"[{ts}] Revisando stock...", flush=True)
+
             disponible = esta_disponible(driver)
+            checks_sin_stock += 1
+            checks_hoy       += 1
+
             if disponible:
-                dias  = (datetime.now() - sin_stock_desde).days
-                horas = (datetime.now() - sin_stock_desde).seconds // 3600
+                dias  = (now - sin_stock_desde).days
+                horas = (now - sin_stock_desde).seconds // 3600
                 print(f"[{ts}] Stock: ✅ SÍ — mandando WhatsApp!\n", flush=True)
                 if not alerta_enviada:
                     enviar_whatsapp(
                         f"🧱 LEGO Project Hail Mary disponible!\n"
                         f"⏳ Estuvo sin stock {dias}d {horas}h\n"
+                        f"🔍 Revisiones totales: {checks_sin_stock}\n"
                         f"🔗 {LEGO_URL}"
                     )
                     alerta_enviada   = True
                     checks_sin_stock = 0
+                    sin_stock_desde  = now
             else:
-                checks_sin_stock += 1
-                dias  = (datetime.now() - sin_stock_desde).days
-                horas = (datetime.now() - sin_stock_desde).seconds // 3600
+                dias  = (now - sin_stock_desde).days
+                horas = (now - sin_stock_desde).seconds // 3600
                 print(f"[{ts}] Stock: ❌ NO  |  Sin stock: {dias}d {horas}h  |  Revisiones: {checks_sin_stock}\n", flush=True)
                 alerta_enviada = False
+
+            # ── REPORTE DIARIO ─────────────────────────────
+            horas_desde_reporte = (now - ultimo_reporte).total_seconds() / 3600
+            if horas_desde_reporte >= 24:
+                dias  = (now - sin_stock_desde).days
+                horas = (now - sin_stock_desde).seconds // 3600
+                enviar_whatsapp(
+                    f"📊 Reporte diario LEGO Hail Mary\n"
+                    f"❌ Sin stock\n"
+                    f"⏳ Llevamos {dias}d {horas}h sin existencia\n"
+                    f"🔍 Revisiones hoy: {checks_hoy}\n"
+                    f"🔍 Revisiones totales: {checks_sin_stock}"
+                )
+                ultimo_reporte = now
+                checks_hoy     = 0
+                print(f"[{ts}] 📊 Reporte diario enviado\n", flush=True)
+
             time.sleep(INTERVALO_MIN * 60)
+
     except KeyboardInterrupt:
         print("\n⛔ Detenido.", flush=True)
     finally:
