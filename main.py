@@ -1,4 +1,29 @@
+import sys
+print("✅ Python arrancó", flush=True)
+
 import time
+print("✅ time OK", flush=True)
+import random
+print("✅ random OK", flush=True)
+import urllib.parse
+print("✅ urllib OK", flush=True)
+import requests
+print("✅ requests OK", flush=True)
+import os
+print("✅ os OK", flush=True)
+from datetime import datetime
+print("✅ datetime OK", flush=True)
+
+print("🔧 Importando Selenium...", flush=True)
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+print("✅ Selenium OK", flush=True)
+
+print("🔧 Creando driver...", flush=True)import time
 import random
 import urllib.parse
 import requests
