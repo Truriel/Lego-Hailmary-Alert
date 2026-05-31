@@ -85,6 +85,11 @@ def enviar_whatsapp(mensaje):
 
 def main():
     print("🔍 Iniciando scraper LEGO — Project Hail Mary", flush=True)
+    enviar_whatsapp(
+        f"🤖 Scraper LEGO iniciado\n"
+        f"⏱ Revisando cada {INTERVALO_MIN} minutos\n"
+        f"🔗 {LEGO_URL}"
+    )
     print(f"⏱  Revisando cada {INTERVALO_MIN} minutos\n", flush=True)
 
     driver              = crear_driver()
